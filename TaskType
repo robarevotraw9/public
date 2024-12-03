@@ -1,0 +1,126 @@
+import threading
+import time
+import queue
+from abc import ABC, abstractmethod
+from functools import wraps
+from enum import Enum
+ 
+# 定义一个枚举类来表示任务类型
+class TaskType(Enum):
+    COMPUTE = 1
+    IO = 2
+ 
+# 定义一个抽象基类来表示任务
+class Task(ABC):
+    @abstractmethod
+    def execute(self):
+        pass
+ 
+# 计算密集型任务的实现
+class ComputeTask(Task):
+    def __init__(self, task_id, compute_time):
+        self.task_id = task_id
+        self.compute_time = compute_time
+ 
+    def execute(self):
+        print(f"Task {self.task_id} (Compute) started.")
+        time.sleep(self.compute_time)  # 模拟计算密集型任务
+        print(f"Task {self.task_id} (Compute) completed.")
+ 
+# IO密集型任务的实现
+class IOTask(Task):
+    def __init__(self, task_id, io_time):
+        self.task_id = task_id
+        self.io_time = io_time
+ 
+    def execute(self):
+        print(f"Task {self.task_id} (IO) started.")
+        time.sleep(self.io_time)  # 模拟IO密集型任务
+        print(f"Task {self.task_id} (IO) completed.")
+ 
+# 定义一个任务工厂类来创建不同类型的任务
+class TaskFactory:
+    @staticmethod
+    def create_task(task_type, task_id, duration):
+        if task_type == TaskType.COMPUTE:
+            return ComputeTask(task_id, duration)
+        elif task_type == TaskType.IO:
+            return IOTask(task_id, duration)
+        else:
+            raise ValueError("Invalid task type.")
+ 
+# 定义一个任务管理器类来管理任务队列和线程池
+class TaskManager(ABC):
+    _instance = None
+ 
+    def __new__(cls, *args, **kwargs):
+        if not cls._instance:
+            cls._instance = super(TaskManager, cls).__new__(cls, *args, **kwargs)
+            cls._instance._init_task_queue()
+        return cls._instance
+ 
+    def __init__(self):
+        self.task_queue = None
+        self.worker_threads = []
+ 
+    def _init_task_queue(self):
+        self.task_queue = queue.Queue()
+ 
+    def start_workers(self, num_workers):
+        for _ in range(num_workers):
+            thread = threading.Thread(target=self._worker)
+            thread.start()
+            self.worker_threads.append(thread)
+ 
+    def add_task(self, task):
+        self.task_queue.put(task)
+ 
+    def stop_workers(self):
+        for _ in range(len(self.worker_threads)):
+            self.task_queue.put(None)  # 使用None作为停止信号
+        for thread in self.worker_threads:
+            thread.join()
+ 
+    @abstractmethod
+    def _worker(self):
+        pass
+ 
+# 定义一个具体的任务管理器实现
+class ConcreteTaskManager(TaskManager):
+    def _worker(self):
+        while True:
+            task = self.task_queue.get()
+            if task is None:
+                break  # 收到停止信号
+            task.execute()
+            self.task_queue.task_done()
+ 
+# 使用装饰器来记录函数执行时间
+def timeit(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        start_time = time.time()
+        result = func(*args, **kwargs)
+        end_time = time.time()
+        print(f"{func.__name__} executed in {end_time - start_time:.4f} seconds")
+        return result
+    return wrapper
+ 
+# 主程序
+@timeit
+def main():
+    task_manager = ConcreteTaskManager()
+    task_manager.start_workers(4)  # 启动4个工作线程
+ 
+    # 添加任务到任务管理器
+    for i in range(10):
+        task_type = TaskType.COMPUTE if i % 2 == 0 else TaskType.IO
+        task = TaskFactory.create_task(task_type, i + 1, 2)  # 每个任务持续2秒
+        task_manager.add_task(task)
+ 
+    # 等待所有任务完成
+    task_manager.task_queue.join()
+    task_manager.stop_workers()
+ 
+if __name__ == "__main__":
+    main()
