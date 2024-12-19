@@ -1,0 +1,15 @@
+function startCountdown(seconds) {
+    let counter = seconds;
+    const interval = setInterval(() => {
+        console.log(`Time left: ${counter} seconds`);
+        counter--;
+
+        if (counter < 0) {
+            clearInterval(interval);
+            console.log("Time's up!");
+        }
+    }, 1000);
+}
+
+// Start a 10-second countdown
+startCountdown(10);
