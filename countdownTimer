@@ -1,0 +1,12 @@
+function countdownTimer(seconds) {
+    let timer = setInterval(() => {
+        console.log(`Time left: ${seconds} seconds`);
+        seconds--;
+        if (seconds < 0) {
+            clearInterval(timer);
+            console.log("Time's up!");
+        }
+    }, 1000);
+}
+
+countdownTimer(10);
