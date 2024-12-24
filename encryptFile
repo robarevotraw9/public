@@ -1,0 +1,24 @@
+#include <iostream>
+#include <fstream>
+
+void encryptFile(const std::string& filename) {
+    std::ifstream inFile(filename);
+    std::ofstream outFile(filename + ".enc");
+
+    char ch;
+    while (inFile.get(ch)) {
+        outFile.put(ch ^ 0xAA); // 简单的异或加密
+    }
+
+    inFile.close();
+    outFile.close();
+    std::cout << "File encrypted: " << filename << ".enc" << std::endl;
+}
+
+int main() {
+    std::string filename;
+    std::cout << "Enter the filename to encrypt: ";
+    std::cin >> filename;
+    encryptFile(filename);
+    return 0;
+}
