@@ -1,0 +1,7 @@
+with open('example.txt', 'r') as file:
+    contents = file.read()
+    print(contents)
+
+# 统计单词数量
+word_count = len(contents.split())
+print(f'Word Count: {word_count}')
