@@ -1,0 +1,14 @@
+import tensorflow as tf
+from tensorflow.keras import layers, models
+
+# 构建简单的图像分类模型
+model = models.Sequential([
+    layers.Conv2D(32, (3,3), activation='relu', input_shape=(64, 64, 3)),
+    layers.MaxPooling2D(2,2),
+    layers.Flatten(),
+    layers.Dense(128, activation='relu'),
+    layers.Dense(10, activation='softmax')
+])
+
+model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+print(model.summary())
