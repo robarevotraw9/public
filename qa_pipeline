@@ -1,0 +1,9 @@
+from transformers import pipeline
+
+qa_pipeline = pipeline("question-answering")
+
+context = "ChatGPT is an AI model developed by OpenAI."
+question = "Who developed ChatGPT?"
+
+answer = qa_pipeline(question=question, context=context)
+print(answer)
