@@ -1,0 +1,9 @@
+@Service
+public class UserService {
+    @Autowired
+    private UserRepository userRepository;
+
+    public void printUsers() {
+        userRepository.findAll().forEach(System.out::println);
+    }
+}
