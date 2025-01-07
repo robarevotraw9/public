@@ -1,0 +1,17 @@
+#include <iostream>
+#include <thread>
+using namespace std;
+
+void printMessage(string message) {
+    cout << message << endl;
+}
+
+int main() {
+    thread t1(printMessage, "线程 1: Hello!");
+    thread t2(printMessage, "线程 2: World!");
+
+    t1.join();
+    t2.join();
+
+    return 0;
+}
