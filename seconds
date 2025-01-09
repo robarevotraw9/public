@@ -1,0 +1,16 @@
+#include <iostream>
+#include <thread>
+#include <chrono>
+using namespace std;
+
+int main() {
+    int seconds;
+    cout << "设置闹钟时间（秒）: ";
+    cin >> seconds;
+
+    cout << "计时中..." << endl;
+    this_thread::sleep_for(chrono::seconds(seconds));
+    cout << "时间到！" << endl;
+
+    return 0;
+}
