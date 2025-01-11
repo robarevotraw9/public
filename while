@@ -1,0 +1,26 @@
+#include <iostream>
+#include <map>
+using namespace std;
+
+int main() {
+    map<string, int> cart;
+    string item;
+    int quantity;
+
+    cout << "输入购物车物品和数量（输入\"done\"结束）:" << endl;
+    while (true) {
+        cout << "物品: ";
+        cin >> item;
+        if (item == "done") break;
+        cout << "数量: ";
+        cin >> quantity;
+        cart[item] += quantity;
+    }
+
+    cout << "购物车内容:" << endl;
+    for (auto &pair : cart) {
+        cout << pair.first << ": " << pair.second << endl;
+    }
+
+    return 0;
+}
