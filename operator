@@ -1,0 +1,48 @@
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <cmath>
+
+struct Node {
+    int x, y, g, h;
+    Node* parent;
+    int f() const { return g + h; }
+};
+
+struct Compare {
+    bool operator()(Node* a, Node* b) { return a->f() > b->f(); }
+};
+
+int heuristic(int x1, int y1, int x2, int y2) {
+    return abs(x1 - x2) + abs(y1 - y2);
+}
+
+// 示例伪地图
+bool is_walkable(int x, int y) {
+    return x >= 0 && y >= 0 && x < 10 && y < 10;
+}
+
+// 简化实现
+void astar(int sx, int sy, int ex, int ey) {
+    std::priority_queue<Node*, std::vector<Node*>, Compare> open;
+    Node* start = new Node{sx, sy, 0, heuristic(sx, sy, ex, ey), nullptr};
+    open.push(start);
+
+    while (!open.empty()) {
+        Node* current = open.top(); open.pop();
+        if (current->x == ex && current->y == ey) {
+            while (current) {
+                std::cout << "(" << current->x << "," << current->y << ") <- ";
+                current = current->parent;
+            }
+            return;
+        }
+        for (int dx = -1; dx <= 1; ++dx)
+            for (int dy = -1; dy <= 1; ++dy)
+                if (abs(dx) + abs(dy) == 1 && is_walkable(current->x + dx, current->y + dy)) {
+                    Node* neighbor = new Node{current->x + dx, current->y + dy,
+                                              current->g + 1, heuristic(current->x + dx, current->y + dy, ex, ey), current};
+                    open.push(neighbor);
+                }
+    }
+}
