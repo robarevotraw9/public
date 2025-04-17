@@ -1,0 +1,15 @@
+const Redis = require('ioredis');
+const pub = new Redis();
+const sub = new Redis();
+
+sub.subscribe('job_channel', () => {
+  sub.on('message', (channel, message) => {
+    console.log(`收到任务: ${message}`);
+    // 执行任务逻辑
+  });
+});
+
+setInterval(() => {
+  const job = { id: Date.now(), task: 'do-something' };
+  pub.publish('job_channel', JSON.stringify(job));
+}, 3000);
